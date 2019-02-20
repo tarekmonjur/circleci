@@ -1,20 +1,22 @@
 version: 2.1
 jobs:
-  bar:
+  myjob:
+    parameters:
+      preinstall-foo:
+        type: boolean
+        default: false
     machine: true
     steps:
-      - checkout
-      - run:
-          command: echo "building"
-      - run:
-          command: echo "testing"
+      - run: echo "preinstall is << parameters.preinstall-foo >>"
+      - when:
+          condition: << parameters.preinstall-foo >>
+          steps:
+            - run: echo "preinstall"
+
 workflows:
-  build:
+  workflow:
     jobs:
-      - bar:
-          pre-steps:
-            - run:
-                command: echo "install custom dependency"
-          post-steps:
-            - run:
-                command: echo "upload artifact to s3"
+      - myjob:
+          preinstall-foo: false
+      - myjob:
+          preinstall-foo: true
